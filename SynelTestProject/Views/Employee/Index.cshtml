@@ -1,0 +1,123 @@
+﻿@model SynelTestProject.Models.EmployeeModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Employee - Page</h2>
+
+<div id="tableSection">
+    <table id="employees" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.PayrollNumber)</th>
+                <th>@Html.DisplayNameFor(model => model.Forenames)</th>
+                <th>@Html.DisplayNameFor(model => model.Surename)</th>
+                <th>@Html.DisplayNameFor(model => model.Date_of_Birth)</th>
+                <th>@Html.DisplayNameFor(model => model.Telephone)</th>
+                <th>@Html.DisplayNameFor(model => model.Mobile)</th>
+                <th>@Html.DisplayNameFor(model => model.Address)</th>
+                <th>@Html.DisplayNameFor(model => model.Address_2)</th>
+                <th>@Html.DisplayNameFor(model => model.PostCode)</th>
+                <th>@Html.DisplayNameFor(model => model.EMail_Home)</th>
+                <th>@Html.DisplayNameFor(model => model.Start_Date)</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div id="fileUploadSection">
+    @using (Html.BeginForm("Upload", "Employee", FormMethod.Post, new { enctype = "multipart/form-data"}))
+    {
+        <input class="btn btn-danger btn-sm" type="file" name="upload" />
+        <br/>
+        <input class="btn btn-success btn-lg" type="submit" value="Import" />
+    }
+</div>
+
+
+@section scripts
+{
+    <script>
+         $(document).ready(function () {
+            var msgSucc = "@TempData["msgSucc"]";
+            var msgErr = "@TempData["msgErr"]";
+            var table = $("#employees").DataTable({
+                ajax: {
+                    url: '/api/EmployeeAPI',
+                    dataSrc: function (json) {
+                        var return_data = new Array();
+                        for (var i = 0; i < json.length; i++) {
+                            return_data.push({
+                                'PayrollNumber': json[i].PayrollNumber,
+                                'Forenames': json[i].Forenames,
+                                'Surename':json[i].Surename,
+                                'Date_of_Birth': json[i].Date_of_Birth.slice(0, 10),
+                                'Telephone': json[i].Telephone,
+                                'Mobile': json[i].Mobile,
+                                'Address': json[i].Address,
+                                'Address_2': json[i].Address_2,
+                                'PostCode': json[i].PostCode,
+                                'EMail_Home': json[i].EMail_Home,
+                                'Start_Date': json[i].Start_Date.slice(0, 10),
+                                'Id':json[i].Id
+                            })
+                        }
+                        return return_data;
+                    }
+                },
+                columns: [
+                    { data: 'PayrollNumber' },
+                    { data: 'Forenames' },
+                    { data: 'Surename' },
+                    { data: 'Date_of_Birth' },
+                    { data: 'Telephone' },
+                    { data: 'Mobile' },
+                    { data: 'Address' },
+                    { data: 'Address_2' },
+                    { data: 'PostCode' },
+                    { data: 'EMail_Home' },
+                    { data: 'Start_Date' },
+                    {
+                        data: 'Id',
+                        render: function (Id) {
+                            return '<a href="/employee/edit/?id=' + Id + '"><span class="btn btn-sm btn-warning"><i class="fa fa-edit" aria-hidden="true"></i></span></a>';
+                        }
+                    }
+                ],
+                aaSorting: [[2, "asc"]]
+
+            });
+
+             if (msgSucc != "empty") {
+                 Swal.fire({
+                     position: 'top-end',
+                     icon: 'success',
+                     title: msgSucc,
+                     showConfirmButton: false,
+                     timer: 1500
+                 });
+             }
+
+             if (msgErr != "empty") {
+                 Swal.fire({
+                     position: 'top-end',
+                     icon: 'error',
+                     title: msgErr,
+                     showConfirmButton: false,
+                     timer: 1500
+                 });
+             }
+
+         });
+    </script>
+   
+}
+
+
+
+
+
